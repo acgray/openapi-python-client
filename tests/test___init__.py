@@ -15,11 +15,11 @@ def test__get_project_for_url_or_path(mocker):
 
     from openapi_python_client import _get_project_for_url_or_path
 
-    project = _get_project_for_url_or_path(url=url, path=path)
+    project = _get_project_for_url_or_path(url=url, path=path, output_path=None, project_name=None)
 
     _get_json.assert_called_once_with(url=url, path=path)
     from_dict.assert_called_once_with(data_dict)
-    _Project.assert_called_once_with(openapi=openapi)
+    _Project.assert_called_once_with(openapi=openapi, output_path=None, project_name=None)
     assert project == _Project()
 
 
@@ -35,7 +35,7 @@ def test_create_new_client(mocker):
 
     create_new_client(url=url, path=path)
 
-    _get_project_for_url_or_path.assert_called_once_with(url=url, path=path)
+    _get_project_for_url_or_path.assert_called_once_with(url=url, path=path, output_path=None, project_name=None)
     project.build.assert_called_once()
 
 
@@ -51,7 +51,7 @@ def test_update_existing_client(mocker):
 
     update_existing_client(url=url, path=path)
 
-    _get_project_for_url_or_path.assert_called_once_with(url=url, path=path)
+    _get_project_for_url_or_path.assert_called_once_with(url=url, path=path, output_path=None, project_name=None)
     project.update.assert_called_once()
 
 

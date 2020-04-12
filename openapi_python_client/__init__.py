@@ -17,10 +17,12 @@ from .openapi_parser import OpenAPI, import_string_from_reference
 __version__ = version(__package__)
 
 
-def _get_project_for_url_or_path(url: Optional[str], path: Optional[Path]) -> _Project:
+def _get_project_for_url_or_path(
+    url: Optional[str], path: Optional[Path], output_path: Optional[Path] = None, project_name: Optional[str] = None
+) -> _Project:
     data_dict = _get_json(url=url, path=path)
     openapi = OpenAPI.from_dict(data_dict)
-    return _Project(openapi=openapi)
+    return _Project(openapi=openapi, output_path=output_path, project_name=project_name)
 
 
 def load_config(*, path: Path) -> None:
@@ -34,15 +36,19 @@ def load_config(*, path: Path) -> None:
             reference.class_overrides[class_name] = reference.Reference(**class_data)
 
 
-def create_new_client(*, url: Optional[str], path: Optional[Path]) -> None:
+def create_new_client(
+    *, url: Optional[str], path: Optional[Path], output: Optional[str] = None, project_name: Optional[str] = None
+) -> None:
     """ Generate the client library """
-    project = _get_project_for_url_or_path(url=url, path=path)
+    project = _get_project_for_url_or_path(url=url, path=path, output_path=output, project_name=project_name)
     project.build()
 
 
-def update_existing_client(*, url: Optional[str], path: Optional[Path]) -> None:
+def update_existing_client(
+    *, url: Optional[str], path: Optional[Path], output: Optional[str] = None, project_name: Optional[str] = None
+) -> None:
     """ Update an existing client library """
-    project = _get_project_for_url_or_path(url=url, path=path)
+    project = _get_project_for_url_or_path(url=url, path=path, output_path=output, project_name=project_name)
     project.update()
 
 
@@ -61,12 +67,12 @@ def _get_json(*, url: Optional[str], path: Optional[Path]) -> Dict[str, Any]:
 
 
 class _Project:
-    def __init__(self, *, openapi: OpenAPI) -> None:
+    def __init__(self, *, openapi: OpenAPI, output_path: str = None, project_name: str = None) -> None:
         self.openapi: OpenAPI = openapi
         self.env: Environment = Environment(loader=PackageLoader(__package__), trim_blocks=True, lstrip_blocks=True)
 
-        self.project_name: str = f"{openapi.title.replace(' ', '-').lower()}-client"
-        self.project_dir: Path = Path.cwd() / self.project_name
+        self.project_name: str = project_name or f"{openapi.title.replace(' ', '-').lower()}-client"
+        self.project_dir: Path = output_path or (Path.cwd() / self.project_name)
 
         self.package_name: str = self.project_name.replace("-", "_")
         self.package_dir: Path = self.project_dir / self.package_name

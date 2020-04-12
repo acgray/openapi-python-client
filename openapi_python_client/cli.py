@@ -42,6 +42,12 @@ def cli(
 def generate(
     url: Optional[str] = typer.Option(None, help="A URL to read the JSON from"),
     path: Optional[pathlib.Path] = typer.Option(None, help="A path to the JSON file"),
+    output: Optional[pathlib.Path] = typer.Option(None, help="Output path"),
+    project_name: Optional[str] = typer.Option(
+        None,
+        help="Name of the created project. Defaults to a name generated from the "
+        'OpenAPI schema title, e.g. "My Schema" would product my-schema-client',
+    ),
 ) -> None:
     """ Generate a new OpenAPI Client library """
     from . import create_new_client
@@ -52,7 +58,7 @@ def generate(
     elif url and path:
         typer.secho("Provide either --url or --path, not both", fg=typer.colors.RED)
         raise typer.Exit(code=1)
-    create_new_client(url=url, path=path)
+    create_new_client(url=url, path=path, output=output, project_name=project_name)
 
 
 @app.command()

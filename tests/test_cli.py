@@ -34,7 +34,7 @@ def test_config(mocker, _create_new_client):
 
     assert result.exit_code == 0
     load_config.assert_called_once_with(path=PosixPath(config_path))
-    _create_new_client.assert_called_once_with(url=None, path=PosixPath(path))
+    _create_new_client.assert_called_once_with(url=None, path=PosixPath(path), output=None, project_name=None)
 
 
 def test_bad_config(mocker, _create_new_client):
@@ -76,7 +76,7 @@ class TestGenerate:
         result = runner.invoke(app, ["generate", f"--url={url}"])
 
         assert result.exit_code == 0
-        _create_new_client.assert_called_once_with(url=url, path=None)
+        _create_new_client.assert_called_once_with(url=url, path=None, output=None, project_name=None)
 
     def test_generate_path(self, _create_new_client):
         path = "cool/path"
@@ -85,7 +85,7 @@ class TestGenerate:
         result = runner.invoke(app, ["generate", f"--path={path}"])
 
         assert result.exit_code == 0
-        _create_new_client.assert_called_once_with(url=None, path=PosixPath(path))
+        _create_new_client.assert_called_once_with(url=None, path=PosixPath(path), output=None, project_name=None)
 
 
 @pytest.fixture
